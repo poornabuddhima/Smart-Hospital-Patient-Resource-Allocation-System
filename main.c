@@ -3,6 +3,7 @@
 void displayMainMenu();
 void showAvailableDoctors();
 void showAvailableBeds(int beds[]);
+void patientAdmit(int ids[], int ages[], int wards[], int days[], char names[][30], char admitDates[][15], int urgency[], int specialties[], int beds[], int *idCounter, int queueCounts[]); // Added missing semicolon here
 
 int main() {
     int mainChoice = 0;
@@ -23,23 +24,29 @@ int main() {
         scanf("%d", &mainChoice);
 
         switch (mainChoice) {
-            case 1: printf("Patient Admit Menu Selected\n");
-            break;
-            case 2: printf("Doctor Channeling Selected\n");
-            break;
-            case 3: printf("Available Beds Selected\n");
-            break;
-            case 4: printf("Available Doctors Selected\n");
-            break;
-            default: printf("Invalid choice!\n");
-            break;
+            case 1:
+                // Calling your patientAdmit function here
+                patientAdmit(patientIds, patientAges, patientWards, patientDays, patientNames, patientAdmitDates, patientUrgency, patientSpecialties, bedOccupancy, &idCounter, bookingCounts);
+                break;
+            case 2:
+                printf("Doctor Channeling Selected\n");
+                break;
+            case 3:
+                showAvailableBeds(bedOccupancy);
+                break;
+            case 4:
+                showAvailableDoctors();
+                break;
+            default:
+                printf("Invalid choice!\n");
+                break;
         }
     }
     return 0;
 }
 
 void displayMainMenu() {
-    printf(" Yasaro Hospital\n");
+    printf("\n--- Yasaro Hospital ---\n");
     printf("1. Patient Admit\n");
     printf("2. Doctor Channeling\n");
     printf("3. Available Beds\n");
@@ -61,4 +68,17 @@ void showAvailableDoctors() {
     printf("2. Paediatrics (Available)\n");
     printf("3. Cardiology (Available)\n");
     printf("4. Neurology (Available)\n");
+}
+
+void patientAdmit(int ids[], int ages[], int wards[], int days[], char names[][30], char admitDates[][15], int urgency[], int specialties[], int beds[], int *idCounter, int queueCounts[]) {
+    int admitChoice = 0;
+    while (admitChoice != 4) {
+        printf("\n--- Admit Menu ---\n");
+        printf("1. New Admit\n");
+        printf("2. Update\n");
+        printf("3. Discharge\n");
+        printf("4. Back\n");
+        printf("Choice: ");
+        scanf("%d", &admitChoice);
+    }
 }

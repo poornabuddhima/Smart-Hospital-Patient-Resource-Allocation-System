@@ -4,7 +4,7 @@ void displayMainMenu();
 void showAvailableDoctors();
 void showAvailableBeds(int beds[]);
 void patientAdmit(int ids[], int ages[], int wards[], int days[], char names[][30], char admitDates[][15], int urgency[], int specialties[], int beds[], int *idCounter, int queueCounts[]); // Added missing semicolon here
-
+int patientIndex(int ids[], int searchId);
 int main() {
     int mainChoice = 0;
     int patientIds[10] = {0};
@@ -81,4 +81,17 @@ void patientAdmit(int ids[], int ages[], int wards[], int days[], char names[][3
         printf("Choice: ");
         scanf("%d", &admitChoice);
     }
+}
+int patientIndex(int ids[], int searchId) {
+    int i = 0;
+    int foundIndex = -1;
+    int people = 1;
+
+    for (i = 0; i < 10 && people ; i++) {
+        switch (ids[i] == searchId) {
+            case 1: foundIndex = i; people  = 0; break;
+            case 0: break;
+        }
+    }
+    return foundIndex;
 }

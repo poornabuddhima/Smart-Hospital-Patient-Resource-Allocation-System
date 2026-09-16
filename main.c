@@ -3,8 +3,9 @@
 void displayMainMenu();
 void showAvailableDoctors();
 void showAvailableBeds(int beds[]);
-void patientAdmit(int ids[], int ages[], int wards[], int days[], char names[][30], char admitDates[][15], int urgency[], int specialties[], int beds[], int *idCounter, int queueCounts[]); // Added missing semicolon here
+void patientAdmit(int ids[], int ages[], int wards[], int days[], char names[][30], char admitDates[][15], int urgency[], int specialties[], int beds[], int *idCounter, int queueCounts[]);
 int patientIndex(int ids[], int searchId);
+
 int main() {
     int mainChoice = 0;
     int patientIds[10] = {0};
@@ -25,7 +26,6 @@ int main() {
 
         switch (mainChoice) {
             case 1:
-                // Calling your patientAdmit function here
                 patientAdmit(patientIds, patientAges, patientWards, patientDays, patientNames, patientAdmitDates, patientUrgency, patientSpecialties, bedOccupancy, &idCounter, bookingCounts);
                 break;
             case 2:
@@ -82,16 +82,27 @@ void patientAdmit(int ids[], int ages[], int wards[], int days[], char names[][3
         scanf("%d", &admitChoice);
     }
 }
-int patientIndex(int ids[], int searchId) {
-    int i = 0;
-    int foundIndex = -1;
-    int people = 1;
 
-    for (i = 0; i < 10 && people ; i++) {
-        switch (ids[i] == searchId) {
-            case 1: foundIndex = i; people  = 0; break;
-            case 0: break;
+int patientIndex(int ids[], int searchId) {
+
+    int foundIndex = -1;
+
+    for (  int i = 0; i < 10; i++) {
+        if (ids[i] == searchId) {
+            foundIndex = i;
+            break;
         }
     }
     return foundIndex;
+}
+
+void registerNewPatient(int ids[], int ages[], int wards[], int days[], char names[][30], char admitDates[][15], int urgency[], int specialties[], int beds[], int *idCounter, int queueCounts[]) {
+    int  foundIndex = -1;
+    int loopControl = 1;
+    for (  int i = 0; i < 10 && loopControl; i++) {
+        switch (ids[i] == 0) {
+            case 1: foundIndex = i; loopControl = 0; break;
+            case 0: break;
+        }
+    }
 }

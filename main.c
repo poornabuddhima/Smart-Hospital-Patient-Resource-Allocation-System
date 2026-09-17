@@ -6,6 +6,7 @@ void showAvailableBeds(int beds[]);
 void patientAdmit(int ids[], int ages[], int wards[], int days[], char names[][30], char admitDates[][15], int urgency[], int specialties[], int beds[], int *idCounter, int queueCounts[]);
 int patientIndex(int ids[], int searchId);
 void registerNewPatient(int ids[], int ages[], int wards[], int days[], char names[][30], char admitDates[][15], int urgency[], int specialties[], int beds[], int *idCounter, int queueCounts[]);
+void patientCosts(int ids[], int days[]);
 
 int main() {
     int mainChoice = 0;
@@ -87,7 +88,7 @@ void patientAdmit(int ids[], int ages[], int wards[], int days[], char names[][3
                 registerNewPatient(ids, ages, wards, days, names, admitDates, urgency, specialties, beds, idCounter, queueCounts);
                 break;
             case 2:
-                printf("Update feature coming soon.\n");
+                patientCosts(ids, days);
                 break;
             case 3:
                 printf("Discharge feature coming soon.\n");
@@ -114,7 +115,6 @@ int patientIndex(int ids[], int searchId) {
 }
 
 void registerNewPatient(int ids[], int ages[], int wards[], int days[], char names[][30], char admitDates[][15], int urgency[], int specialties[], int beds[], int *idCounter, int queueCounts[]) {
-    // Moved variables here so the function can access and reset them properly
     int foundIndex = -1;
     int loopControl = 1;
     int isAdmitted = 0;
@@ -172,6 +172,32 @@ void registerNewPatient(int ids[], int ages[], int wards[], int days[], char nam
 
         case 0:
             printf("Database full!\n");
+            break;
+    }
+}
+
+void patientCosts(int ids[], int days[]) {
+    int searchId = 0;
+    int foundIndex = -1;
+    float medCost = 0;
+    float surgeryCost = 0;
+
+    printf("Enter Patient ID to update: ");
+    scanf("%d", &searchId);
+
+
+    foundIndex = patientIndex(ids, searchId);
+
+    switch (foundIndex != -1) {
+        case 1:
+            printf("Input Medicine Cost: ");
+            scanf("%f", &medCost);
+            printf("Input Surgery Cost: ");
+            scanf("%f", &surgeryCost);
+            printf("Costs updated successfully for patient index %d!\n", foundIndex);
+            break;
+        case 0:
+            printf("Patient ID not found!\n");
             break;
     }
 }

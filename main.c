@@ -7,6 +7,9 @@ void patientAdmit(int ids[], int ages[], int wards[], int days[], char names[][3
 int patientIndex(int ids[], int searchId);
 void registerNewPatient(int ids[], int ages[], int wards[], int days[], char names[][30], char admitDates[][15], int urgency[], int specialties[], int beds[], int *idCounter, int queueCounts[]);
 void patientCosts(int ids[], int days[]);
+float baseConsultationFee(int specialty);
+float emergencySurcharge(int urgency, float baseFee);
+float wardDailyRate(int wardId);
 
 int main() {
     int mainChoice = 0;
@@ -185,7 +188,6 @@ void patientCosts(int ids[], int days[]) {
     printf("Enter Patient ID to update: ");
     scanf("%d", &searchId);
 
-
     foundIndex = patientIndex(ids, searchId);
 
     switch (foundIndex != -1) {
@@ -200,4 +202,35 @@ void patientCosts(int ids[], int days[]) {
             printf("Patient ID not found!\n");
             break;
     }
+}
+
+float baseConsultationFee(int specialty) {
+    float fee = 1500.0;
+    switch (specialty) {
+        case 1: fee = 1500.0; break;
+        case 2: fee = 2500.0; break;
+        case 3: fee = 4500.0; break;
+        case 4: fee = 5000.0; break;
+    }
+    return fee;
+}
+
+float emergencySurcharge(int urgency, float baseFee) {
+    float surcharge = 0.0;
+    switch (urgency) {
+        case 2: surcharge = baseFee * 0.20; break;
+        case 3: surcharge = baseFee * 0.50; break;
+    }
+    return surcharge;
+}
+
+float wardDailyRate(int wardId) {
+    float rate = 0.0;
+    switch (wardId) {
+        case 1: rate = 3000.0; break;
+        case 2: rate = 6000.0; break;
+        case 3: rate = 12000.0; break;
+        case 4: rate = 25000.0; break;
+    }
+    return rate;
 }

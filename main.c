@@ -5,6 +5,7 @@ void showAvailableDoctors();
 void showAvailableBeds(int beds[]);
 void patientAdmit(int ids[], int ages[], int wards[], int days[], char names[][30], char admitDates[][15], int urgency[], int specialties[], int beds[], int *idCounter, int queueCounts[]);
 int patientIndex(int ids[], int searchId);
+void registerNewPatient(int ids[], int ages[], int wards[], int days[], char names[][30], char admitDates[][15], int urgency[], int specialties[], int beds[], int *idCounter, int queueCounts[]);
 
 int main() {
     int mainChoice = 0;
@@ -80,14 +81,30 @@ void patientAdmit(int ids[], int ages[], int wards[], int days[], char names[][3
         printf("4. Back\n");
         printf("Choice: ");
         scanf("%d", &admitChoice);
+
+        switch (admitChoice) {
+            case 1:
+                registerNewPatient(ids, ages, wards, days, names, admitDates, urgency, specialties, beds, idCounter, queueCounts);
+                break;
+            case 2:
+                printf("Update feature coming soon.\n");
+                break;
+            case 3:
+                printf("Discharge feature coming soon.\n");
+                break;
+            case 4:
+                printf("Returning to main menu...\n");
+                break;
+            default:
+                printf("Invalid choice!\n");
+                break;
+        }
     }
 }
 
 int patientIndex(int ids[], int searchId) {
-
     int foundIndex = -1;
-
-    for (  int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++) {
         if (ids[i] == searchId) {
             foundIndex = i;
             break;
@@ -97,12 +114,64 @@ int patientIndex(int ids[], int searchId) {
 }
 
 void registerNewPatient(int ids[], int ages[], int wards[], int days[], char names[][30], char admitDates[][15], int urgency[], int specialties[], int beds[], int *idCounter, int queueCounts[]) {
-    int  foundIndex = -1;
+    // Moved variables here so the function can access and reset them properly
+    int foundIndex = -1;
     int loopControl = 1;
-    for (  int i = 0; i < 10 && loopControl; i++) {
+    int isAdmitted = 0;
+
+    for (int i = 0; i < 10 && loopControl; i++) {
         switch (ids[i] == 0) {
-            case 1: foundIndex = i; loopControl = 0; break;
-            case 0: break;
+            case 1:
+                foundIndex = i;
+                loopControl = 0;
+                break;
+            case 0:
+                break;
         }
+    }
+
+    switch (foundIndex != -1) {
+        case 1:
+            ids[foundIndex] = *idCounter;
+            printf("Patient ID Assigned: %d\n", ids[foundIndex]);
+            (*idCounter)++;
+
+            printf("Enter Patient Name: ");
+            scanf("%s", names[foundIndex]);
+
+            printf("Enter Age: ");
+            scanf("%d", &ages[foundIndex]);
+
+            printf("Is Admitted to Ward? (1 = Yes, 0 = No): ");
+            scanf("%d", &isAdmitted);
+
+            switch (isAdmitted) {
+                case 1:
+                    printf("Enter Admit Date (Day number): ");
+                    scanf("%s", admitDates[foundIndex]);
+
+                    printf("Enter Ward ID (1-4): ");
+                    scanf("%d", &wards[foundIndex]);
+
+                    switch (wards[foundIndex] >= 1 && wards[foundIndex] <= 4) {
+                        case 1:
+                            beds[wards[foundIndex]] = 1;
+                            break;
+                    }
+                    break;
+            }
+
+            printf("Select Specialty ID (1-4): ");
+            scanf("%d", &specialties[foundIndex]);
+
+            printf("Enter Emergency Level (1-3): ");
+            scanf("%d", &urgency[foundIndex]);
+
+            printf("Patient successfully registered!\n");
+            break;
+
+        case 0:
+            printf("Database full!\n");
+            break;
     }
 }

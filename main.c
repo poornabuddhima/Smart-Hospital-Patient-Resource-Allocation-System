@@ -233,13 +233,12 @@ float wardDailyRate(int wardId) {
         case 4: rate = 25000.0; break;
     }
     return rate;
-}
 float wardCost(int isAdmitted, int wardId, int days) {
-    switch (isAdmitted > 0) {
-        case 1: return days * wardDailyRate(wardId);
-        case 0: return 0.0;
+    if (isAdmitted > 0) {
+        return days * wardDailyRate(wardId);
     }
-    return 0.0;
+
+}
 }
 
 float grossTotal(float baseFee, float surcharge, float wardCost) {
@@ -247,10 +246,17 @@ float grossTotal(float baseFee, float surcharge, float wardCost) {
 }
 
 float discount(int age, float grossTotal) {
-    int ageLimit = (age < 5 || age > 65);
-    float discount = 0.0;
-    switch (ageLimit) {
-        case 1: discount = grossTotal * 0.15; break;
+    float discountAmount = 0.0;
+
+    if (age < 5 || age > 65) {
+        discountAmount = grossTotal * 0.15;
     }
-    return discount;
+
+    return discountAmount;
 }
+void dischargePatient(int wards[], int beds[], int index, int isAdmitted) {
+    if (isAdmitted == 1 && wards[index] >= 1 && wards[index] <= 4) {
+        beds[wards[index]] = 0;
+    }
+}
+

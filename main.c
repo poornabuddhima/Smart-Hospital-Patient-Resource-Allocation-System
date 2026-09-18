@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 void displayMainMenu();
 void showAvailableDoctors();
@@ -14,6 +15,7 @@ float wardCost(int isAdmitted, int wardId, int days);
 float grossTotal(float baseFee, float surcharge, float wardCostVal);
 float discount(int age, float grossTotalVal);
 void dischargePatient(int wards[], int beds[], int index, int isAdmitted);
+void printPatientBill(int ids[], int ages[], int wards[], int days[], char names[][30], int urgency[], int specialties[], int foundIndex);
 
 int main() {
     int mainChoice = 0;
@@ -120,6 +122,9 @@ void patientAdmit(int ids[], int ages[], int wards[], int days[], char names[][3
                     if (days[foundIndex] < 1) {
                         days[foundIndex] = 1;
                     }
+
+                    // Automatically print the bill upon discharge
+                    printPatientBill(ids, ages, wards, days, names, urgency, specialties, foundIndex);
 
                     dischargePatient(wards, beds, foundIndex, (wards[foundIndex] > 0 ? 1 : 0));
                     printf("Patient discharged successfully!\n");
@@ -239,14 +244,10 @@ void patientCosts(int ids[], int days[]) {
 float baseConsultationFee(int specialty) {
     float fee = 1500.0;
     switch (specialty) {
-        case 1: fee = 1500.0;
-        break;
-        case 2: fee = 2500.0;
-        break;
-        case 3: fee = 4500.0;
-        break;
-        case 4: fee = 5000.0;
-        break;
+        case 1: fee = 1500.0; break;
+        case 2: fee = 2500.0; break;
+        case 3: fee = 4500.0; break;
+        case 4: fee = 5000.0; break;
     }
     return fee;
 }
@@ -254,10 +255,8 @@ float baseConsultationFee(int specialty) {
 float emergencySurcharge(int urgency, float baseFee) {
     float surcharge = 0.0;
     switch (urgency) {
-        case 2: surcharge = baseFee * 0.20;
-        break;
-        case 3: surcharge = baseFee * 0.50;
-         break;
+        case 2: surcharge = baseFee * 0.20; break;
+        case 3: surcharge = baseFee * 0.50; break;
     }
     return surcharge;
 }
@@ -265,14 +264,10 @@ float emergencySurcharge(int urgency, float baseFee) {
 float wardDailyRate(int wardId) {
     float rate = 0.0;
     switch (wardId) {
-        case 1: rate = 3000.0;
-         break;
-        case 2: rate = 6000.0;
-         break;
-        case 3: rate = 12000.0;
-        break;
-        case 4: rate = 25000.0;
-        break;
+        case 1: rate = 3000.0; break;
+        case 2: rate = 6000.0; break;
+        case 3: rate = 12000.0; break;
+        case 4: rate = 25000.0; break;
     }
     return rate;
 }
@@ -300,4 +295,91 @@ void dischargePatient(int wards[], int beds[], int index, int isAdmitted) {
     if (isAdmitted == 1 && wards[index] >= 1 && wards[index] <= 4) {
         beds[wards[index]] = 0;
     }
+}
+
+void printPatientBill(int ids[], int ages[], int wards[], int days[], char names[][30], int urgency[], int specialties[], int foundIndex) {
+    float baseFee = baseConsultationFee(specialties[foundIndex]);
+    float surcharge = emergencySurcharge(urgency[foundIndex], baseFee);
+    int isAdmitted = (wards[foundIndex] > 0 ? 1 : 0);
+    float wCost = wardCost(isAdmitted, wards[foundIndex], days[foundIndex]);
+    float gross = grossTotal(baseFee, surcharge, wCost);
+    float disc = discount(ages[foundIndex], gross);
+    float finalPayable = gross - disc;
+
+    char specName[30];
+    switch (specialties[foundIndex]) {
+        case 1: strcpy(specName, "General Practice");
+         break;
+        case 2: strcpy(specName, "Paediatrics");
+         break;
+        case 3: strcpy(specName, "Cardiology");
+         break;
+        case 4: strcpy(specName, "Neurology");
+        break;
+        default: strcpy(specName, "General");
+         break;
+    }
+
+    char wardName[30];
+    switch (wards[foundIndex]) {
+        case 1: strcpy(wardName, "General Ward (Bed #01)");
+        break;
+        case 2: strcpy(wardName, "Paediatric Ward (Bed #01)");
+         break;
+        case 3: strcpy(wardName, "Surgical Ward (Bed #01)");
+         break;
+        case 4: strcpy(wardName, "ICU (Bed #01)");
+        break;
+        default: strcpy(wardName, "Not Admitted");
+         break;
+    }
+
+    char urgencyText[30];
+    int surchargePct = 0;
+    if (urgency[foundIndex] == 2) {
+        surchargePct = 20;
+        strcpy(urgencyText, "Level 2 (Urgent)");
+    } else if (urgency[foundIndex] == 3) {
+        surchargePct = 50;
+        strcpy(urgencyText, "Level 3 (Critical)");
+    } else {
+        surchargePct = 0;
+        strcpy(urgencyText, "Level 1 (Routine)");
+    }
+
+    printf("\n====================================================\n");
+    printf(" HOSPITAL ADMISSION & BILL\n");
+    printf("----------------------------------------------------------------------------------------\n");
+    printf("Patient ID   : PAT-%d\n", ids[foundIndex]);
+    printf("Patient Name : %s\n", names[foundIndex]);
+    if (ages[foundIndex] < 5 || ages[foundIndex] > 65) {
+        printf("Age          : %d Years (15% Eligible)\n", ages[foundIndex]);
+    } else {
+        printf("Age          : %d Years (Not Eligible)\n", ages[foundIndex]);
+    }
+    printf("Specialty    : %s\n", specName);
+    printf("Assigned Ward: %s\n", wardName);
+    if (wards[foundIndex] > 0) {
+        printf("Ward Stay    : %d Days\n", days[foundIndex]);
+    }
+    printf("Urgency Level: %s\n", urgencyText);
+    printf("----------------------------------------------------------------------------------------\n");
+    printf("Base Consultation Fee : LKR %5\n", baseFee);
+    printf("Emergency Surcharge   : LKR %5f (%d%%)\n", surcharge, surchargePct);
+    if (wards[foundIndex] > 0) {
+        printf("Ward Stay Cost (%d Days) : LKR %5f\n", days[foundIndex], wCost);
+    } else {
+        printf("Ward Stay Cost (0 Days)  : LKR   0.00\n");
+    }
+    printf("----------------------------------------------------------------------------------------\n");
+    printf("Gross Total Bill      : LKR %5f\n", gross);
+    if (disc > 0) {
+        printf("Age  Discount  : LKR -%5f (15%%)\n", disc);
+    } else {
+        printf("Age Subsidy Discount  : LKR    0.00 (0%%)\n");
+    }
+    printf("----------------------------------------------------------------------------------------\n");
+    printf("Final Payable Amount  : LKR %5f\n", finalPayable);
+    printf("Estimated Waiting Time: 0.00 mins (Immediate Attention)\n");
+    printf("====================================================\n");
 }

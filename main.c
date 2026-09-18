@@ -234,3 +234,23 @@ float wardDailyRate(int wardId) {
     }
     return rate;
 }
+float wardCost(int isAdmitted, int wardId, int days) {
+    switch (isAdmitted > 0) {
+        case 1: return days * wardDailyRate(wardId);
+        case 0: return 0.0;
+    }
+    return 0.0;
+}
+
+float grossTotal(float baseFee, float surcharge, float wardCost) {
+    return baseFee + surcharge + wardCost;
+}
+
+float discount(int age, float grossTotal) {
+    int ageLimit = (age < 5 || age > 65);
+    float discount = 0.0;
+    switch (ageLimit) {
+        case 1: discount = grossTotal * 0.15; break;
+    }
+    return discount;
+}

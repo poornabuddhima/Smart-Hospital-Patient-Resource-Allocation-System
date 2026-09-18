@@ -10,6 +10,10 @@ void patientCosts(int ids[], int days[]);
 float baseConsultationFee(int specialty);
 float emergencySurcharge(int urgency, float baseFee);
 float wardDailyRate(int wardId);
+float wardCost(int isAdmitted, int wardId, int days);
+float grossTotal(float baseFee, float surcharge, float wardCostVal);
+float discount(int age, float grossTotalVal);
+void dischargePatient(int wards[], int beds[], int index, int isAdmitted);
 
 int main() {
     int mainChoice = 0;
@@ -93,9 +97,37 @@ void patientAdmit(int ids[], int ages[], int wards[], int days[], char names[][3
             case 2:
                 patientCosts(ids, days);
                 break;
-            case 3:
-                printf("Discharge feature coming soon.\n");
+            case 3: {
+                int searchId = 0;
+                int foundIndex = -1;
+                printf("Enter Patient ID to discharge: ");
+                scanf("%d", &searchId);
+                foundIndex = patientIndex(ids, searchId);
+
+                if (foundIndex != -1) {
+                    int admitDayNum = 0;
+                    for (int i = 0; admitDates[foundIndex][i] != '\0'; i++) {
+                        if (admitDates[foundIndex][i] >= '0' && admitDates[foundIndex][i] <= '9') {
+                            admitDayNum = admitDayNum * 10 + (admitDates[foundIndex][i] - '0');
+                        }
+                    }
+
+                    int dischargeDayNum = 0;
+                    printf("Enter Discharge Date (Day number): ");
+                    scanf("%d", &dischargeDayNum);
+
+                    days[foundIndex] = dischargeDayNum - admitDayNum;
+                    if (days[foundIndex] < 1) {
+                        days[foundIndex] = 1;
+                    }
+
+                    dischargePatient(wards, beds, foundIndex, (wards[foundIndex] > 0 ? 1 : 0));
+                    printf("Patient discharged successfully!\n");
+                } else {
+                    printf("Patient ID not found!\n");
+                }
                 break;
+            }
             case 4:
                 printf("Returning to main menu...\n");
                 break;
@@ -207,10 +239,14 @@ void patientCosts(int ids[], int days[]) {
 float baseConsultationFee(int specialty) {
     float fee = 1500.0;
     switch (specialty) {
-        case 1: fee = 1500.0; break;
-        case 2: fee = 2500.0; break;
-        case 3: fee = 4500.0; break;
-        case 4: fee = 5000.0; break;
+        case 1: fee = 1500.0;
+        break;
+        case 2: fee = 2500.0;
+        break;
+        case 3: fee = 4500.0;
+        break;
+        case 4: fee = 5000.0;
+        break;
     }
     return fee;
 }
@@ -218,8 +254,10 @@ float baseConsultationFee(int specialty) {
 float emergencySurcharge(int urgency, float baseFee) {
     float surcharge = 0.0;
     switch (urgency) {
-        case 2: surcharge = baseFee * 0.20; break;
-        case 3: surcharge = baseFee * 0.50; break;
+        case 2: surcharge = baseFee * 0.20;
+        break;
+        case 3: surcharge = baseFee * 0.50;
+         break;
     }
     return surcharge;
 }
@@ -227,36 +265,39 @@ float emergencySurcharge(int urgency, float baseFee) {
 float wardDailyRate(int wardId) {
     float rate = 0.0;
     switch (wardId) {
-        case 1: rate = 3000.0; break;
-        case 2: rate = 6000.0; break;
-        case 3: rate = 12000.0; break;
-        case 4: rate = 25000.0; break;
+        case 1: rate = 3000.0;
+         break;
+        case 2: rate = 6000.0;
+         break;
+        case 3: rate = 12000.0;
+        break;
+        case 4: rate = 25000.0;
+        break;
     }
     return rate;
+}
+
 float wardCost(int isAdmitted, int wardId, int days) {
     if (isAdmitted > 0) {
         return days * wardDailyRate(wardId);
     }
-
-}
-}
-
-float grossTotal(float baseFee, float surcharge, float wardCost) {
-    return baseFee + surcharge + wardCost;
+    return 0.0;
 }
 
-float discount(int age, float grossTotal) {
+float grossTotal(float baseFee, float surcharge, float wardCostVal) {
+    return baseFee + surcharge + wardCostVal;
+}
+
+float discount(int age, float grossTotalVal) {
     float discountAmount = 0.0;
-
     if (age < 5 || age > 65) {
-        discountAmount = grossTotal * 0.15;
+        discountAmount = grossTotalVal * 0.15;
     }
-
     return discountAmount;
 }
+
 void dischargePatient(int wards[], int beds[], int index, int isAdmitted) {
     if (isAdmitted == 1 && wards[index] >= 1 && wards[index] <= 4) {
         beds[wards[index]] = 0;
     }
 }
-

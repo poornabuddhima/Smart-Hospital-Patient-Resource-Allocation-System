@@ -16,6 +16,7 @@ float grossTotal(float baseFee, float surcharge, float wardCostVal);
 float discount(int age, float grossTotalVal);
 void dischargePatient(int wards[], int bedsAssigned[], int beds[4][20], int index, int isAdmitted);
 void printPatientBill(int ids[], int ages[], int wards[], int bedsAssigned[], int days[], char names[][30], int urgency[], int specialties[], int foundIndex, float specFees[], float wardRates[], char* specNames[], char* wardNames[]);
+void doctorChanneling(char* specNames[], float specFees[], int specTimes[], int specCaps[], int specialtyQueueCounts[]);
 
 int main() {
     int mainChoice = 0;
@@ -29,7 +30,7 @@ int main() {
     int patientUrgency[10] = {0};
     int patientSpecialties[10] = {0};
 
-    // Lookup arrays placed inside main
+
     char* SPEC_NAMES[] = {"", "General Practice (OPD)", "Paediatrics", "Cardiology", "Neurology"};
     float SPEC_FEES[] = {0.0f, 1500.0f, 2500.0f, 4500.0f, 5000.0f};
     int SPEC_TIMES[] = {0, 15, 20, 30, 30};
@@ -39,7 +40,8 @@ int main() {
     float WARD_RATES[] = {0.0f, 3000.0f, 6000.0f, 12000.0f, 25000.0f};
     int WARD_CAPACITIES[] = {0, 20, 10, 10, 5};
 
-    // 2D integer array for bed occupancy matrix [4 Wards][20 Max Beds]
+    int specialtyNumbers[5] = {0};
+
     int bedOccupancy[4][20] = {0};
     int idCounter = 1;
 
@@ -52,7 +54,7 @@ int main() {
                 patientAdmit(patientIds, patientAges, patientWards, patientBeds, patientDays, patientNames, patientAdmitDates, patientUrgency, patientSpecialties, bedOccupancy, &idCounter, WARD_NAMES, WARD_CAPACITIES, SPEC_FEES, WARD_RATES, SPEC_NAMES);
                 break;
             case 2:
-                printf("Doctor Channeling Selected\n");
+                doctorChanneling(SPEC_NAMES, SPEC_FEES, SPEC_TIMES, SPEC_CAPS, specialtyNumbers);
                 break;
             case 3:
                 showAvailableBeds(bedOccupancy, WARD_NAMES, WARD_CAPACITIES);
@@ -360,22 +362,76 @@ void printPatientBill(int ids[], int ages[], int wards[], int bedsAssigned[], in
     }
     printf("Urgency Level: %s\n", urgencyText);
     printf("----------------------------------------------------------------------------------------\n");
-    printf("Base Consultation Fee : LKR %10.2f\n", baseFee);
-    printf("Emergency Surcharge   : LKR %10.2f (%d%%)\n", surcharge, surchargePct);
+    printf("Base Consultation Fee : LKR %5f\n", baseFee);
+    printf("Emergency Surcharge   : LKR %5f (%d%%)\n", surcharge, surchargePct);
     if (wards[foundIndex] > 0) {
-        printf("Ward Stay Cost (%d Days) : LKR %10.2f\n", days[foundIndex], wCost);
+        printf("Ward Stay Cost (%d Days) : LKR %5f\n", days[foundIndex], wCost);
     } else {
         printf("Ward Stay Cost (0 Days)  : LKR   0.00\n");
     }
     printf("----------------------------------------------------------------------------------------\n");
-    printf("Gross Total Bill      : LKR %10.2f\n", gross);
+    printf("Gross Total Bill      : LKR %5f\n", gross);
     if (disc > 0) {
-        printf("Age Subsidy Discount  : LKR -%10.2f (15%%)\n", disc);
+        printf("Age Subsidy Discount  : LKR -%5f (15%%)\n", disc);
     } else {
-        printf("Age Subsidy Discount  : LKR    0.00 (0%%)\n");
+        printf("Age Subsidy Discount  : LKR    0.00 \n");
     }
     printf("----------------------------------------------------------------------------------------\n");
-    printf("Final Payable Amount  : LKR %10.2f\n", finalPayable);
+    printf("Final Payable Amount  : LKR 5f\n", finalPayable);
     printf("Estimated Waiting Time: 0.00 mins (Immediate Attention)\n");
+    printf("====================================================\n");
+}
+
+void doctorChanneling(char* specNames[], float specFees[], int specTimes[], int specCaps[], int specialtyNumbers[]) {
+    int specialtyId = 0;
+    showAvailableDoctors(specNames, specFees, specTimes, specCaps);
+    printf("Select Consultant Specialty ID (1-4): ");
+    scanf("%d", &specialtyId);
+
+    if (specialtyId < 1 || specialtyId > 4) {
+        printf("Invalid Specialty ID!\n");
+        return;
+    }
+
+    if (specialtyNumbers[specialtyId] >= specCaps[specialtyId]) {
+        printf("Booking Full! Daily capacity for %s reached.\n", specNames[specialtyId]);
+        return;
+    }
+
+    char name[30];
+    int age = 0;
+    char phone[15];
+
+    printf("Enter Patient Name: ");
+    scanf("%s", name);
+    printf("Enter Age: ");
+    scanf("%d", &age);
+    printf("Enter Phone Number: ");
+    scanf("%s", phone);
+specialtyNumbers[specialtyId]++;
+    int queueNumber =specialtyNumbers[specialtyId];
+
+    int startMinutes = 16 * 60;
+    int avgLateTime = 15;
+    int consultationDuration = specTimes[specialtyId];
+
+    int totalMinutes = startMinutes + avgLateTime + ((queueNumber - 1) * consultationDuration);
+    int apptHour = (totalMinutes / 60) % 24;
+    int apptMin = totalMinutes % 60;
+
+    printf("===================================================\n");
+    printf(" DOCTOR CHANNELING APPOINTMENT TICKET\n");
+    printf("----------------------------------------------------\n");
+    printf("Specialty    : %s\n", specNames[specialtyId]);
+    printf("Patient Name : %s\n", name);
+    printf("Age & Phone  : %d Years | %s\n", age, phone);
+    printf("Booking Order: #%02d\n", queueNumber);
+    printf("Consultation Start : 04:00 PM\n");
+    printf("Average Late Time  : %d mins\n", avgLateTime);
+    printf("Estimated Arrival  : %02d:%02d %s\n",
+           (apptHour > 12 ? apptHour - 12 : (apptHour == 0 ? 12 : apptHour)),
+           apptMin,
+           (apptHour >= 12 ? "PM" : "AM"));
+    printf("Consultation Fee   : LKR %.2f\n", specFees[specialtyId]);
     printf("====================================================\n");
 }

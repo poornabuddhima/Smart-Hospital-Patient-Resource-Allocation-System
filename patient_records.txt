@@ -1,0 +1,3 @@
+ID: PAT-1 | Name: poorna | Admit Date: 2026-07-01 | Discharge Date: 2026-07-25 | Final Paid: LKR 6000.00
+ID: PAT-1 | Name: poor | Admit Date: 2026-07-01 | Discharge Date: 2026-07-16 | Final Paid: LKR 46500.00
+ID: PAT-1 | Name: 1 | Admit Date: 1 | Discharge Date: 4 | Final Paid: LKR 9999999827968.00
